@@ -67,6 +67,19 @@ else:
 
     st.download_button("⬇️ Filtered CSV download karein", filtered.to_csv(index=False), "keyword_research.csv")
 
+    if selected_niche != "All niches":
+        from export_report import build_cerebro_report
+        market_df = read_table("market_analysis", selected_niche)
+        report_buf = build_cerebro_report(selected_niche, filtered, market_df if not market_df.empty else None)
+        st.download_button(
+            "📊 Cerebro-style formatted report (XLSX)",
+            report_buf.getvalue(),
+            f"{selected_niche}_keyword_research_report.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            help="Keyword table + brand comparison, same layout as your manual sheets. "
+                 "Rank-grid ASIN columns are pre-filled but the rank cells (highlighted) need manual entry."
+        )
+
     st.markdown("#### Top opportunity keywords (high volume, low CPR)")
     opp = filtered.dropna(subset=["search_volume", "cpr"])
     opp = opp[opp["cpr"] > 0]
